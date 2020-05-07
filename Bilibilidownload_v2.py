@@ -111,7 +111,7 @@ class BilibiliDownloader:
         try:
 
             if  "?"  in self.Bvid:
-                print("尝试获取分P视频下载信息")
+                print("尝试获取分P视频下载信息\n")
                 url="https://api.bilibili.com/x/web-interface/view/detail?bvid="+self.Bvid.split("?")[0]+"&aid=&jsonp=jsonp"
             else:
                 url="https://api.bilibili.com/x/web-interface/view/detail?bvid="+self.Bvid+"&aid=&jsonp=jsonp"
@@ -139,6 +139,7 @@ class BilibiliDownloader:
 
 
     def getVideoDownload_info(self):
+        print("安全装置解除\n")
         print("开始获取视频下载信息：\n")
         # header_info={
         #         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -234,7 +235,7 @@ class BilibiliDownloader:
                         print("获取地址失败")
         except Exception as e:
             print(str(e))
-            print("错误")
+            print("错误\n")
         return
 
 
@@ -344,11 +345,11 @@ class BilibiliDownloader:
 
             # with open(self.path, "wb") as f:
             #     f.write(requests.get(url=self.videoUrl,headers=Downloadheader, stream=True, verify=False).content)
-            print("下载完成")
+            print("下载完成\n")
 
         except Exception as e:
             print(str(e))
-            print("错误")
+            print("错误\n")
 
 
 
@@ -374,9 +375,20 @@ class BilibiliDownloader:
                 }
         try:
             print("开始下载音频")
+
+            # with closing(requests.get(url=self.videoUrl,headers=Downloadheader_Audio, stream=True, verify=False)) as response:
+            #     chunk_size = 102400  # 单次请求最大值
+            #     content_size = int(response.headers['content-length'])  # 内容体总大小
+            #     data_count = 0
+            #     with open(self.path.split('.')[0]+"_audio.mp3", "wb") as file:
+            #         for data in response.iter_content(chunk_size=chunk_size):
+            #             file.write(data)
+            #             data_count = data_count + len(data)
+            #             now_jd = (data_count / content_size) * 100
+            #             print("\r 文件下载进度：%d%%(%d/%d)" % (now_jd, data_count, content_size), end=" ")
             with open(self.path.split('.')[0]+"_audio.mp3", "wb") as f:
                 f.write(requests.get(url=self.audioUrl,headers=Downloadheader_Audio, stream=True, verify=False).content)
-            print("下载完成")
+            print("下载完成\n")
         except Exception as e:
             print(str(e))
             print("错误")
@@ -445,9 +457,9 @@ class BilibiliDownloader:
                 os.remove(self.path.split('.')[0]+"_audio.mp3") 
             if os.path.exists(self.path.split('.')[0] + '_Converted.mp4'):  # 重命名
                 os.rename(self.path.split('.')[0] + '_Converted.mp4',self.path.split('.')[0] + '.mp4') 
-                print("清理成功")
+                print("清理成功\n")
         except Exception as e:
-            print("清理失败"+str(e))
+            print("清理失败\n"+str(e))
 
 
 
@@ -464,9 +476,9 @@ class BilibiliDownloader:
                 PathoflistTxt=current_path+"/list.txt"
                 if os.path.exists(PathoflistTxt):  # 临时数据
                         os.remove(PathoflistTxt) 
-            print("清理成功")
+            print("清理成功\n")
         except Exception as e:
-            print("清理失败"+str(e))
+            print("清理失败\n"+str(e))
 
 
 
@@ -477,11 +489,15 @@ class BilibiliDownloader:
 
 
 def main():
+    print("连通率为100%\n")
     print("Please input Bvid")
     Bvid=input()
+    print("思考形态以中文为基准，进行思维连接…连接没有异常")
+    print("下载界面连接\n")
     #Bvid="BV12t4y127TD"
     Bd=BilibiliDownloader(Bvid)
     Bd.getVideo_basicInfo()
+    print("移往下载口")
     Bd.getVideoDownload_info()
     if Bd.audioUrl!="":
         Bd.getVideo_ContentRange()
