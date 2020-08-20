@@ -219,6 +219,7 @@ class BilibiliDownloader:
                         kv=json.loads(searchObj.group(2))
                         kv=kv["data"]["dash"]["audio"]
                         kv=kv[0]
+                        #self.audioUrl="http://upos-sz-mirrorcos.bilivideo.com/upgcxcode/44/93/22219344/22219344_da3-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1597904456&gen=playurl&os=cosbv&oi=2073634379&trid=67ff9379e5094afd9d6c228b48b765e9u&platform=pc&upsig=ab3727ee35575318d61956bcd18e4fce&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,platform&mid=11743208&orderid=0,3&agrr=0&logo=80000000"
                         self.audioUrl=kv['baseUrl']
                         print("音频下载地址"+self.audioUrl)
 
@@ -241,21 +242,21 @@ class BilibiliDownloader:
 
     def getVideo_ContentRange(self):
         try:
-            header={
-                'accept': '*/*',
-                'accept-encoding': 'identity',
-                'accept-language': 'zh-CN,zh;q=0.9,ja-JP;q=0.8,ja;q=0.7,en-US;q=0.6,en;q=0.5',
-                'if-range': '"5e9490bf-36d6fa"',
-                'origin': 'https://www.bilibili.com',
-                'range': 'bytes=2594126-2794294',
-                'referer': 'https://www.bilibili.com/',
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'cross-site',
-                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
+            ContentRange_header={
+            'Accept': '*/*',
+            'Accept-Encoding': 'identity',
+            'Accept-Language': 'zh-CN,zh;q=0.9,ja-JP;q=0.8,ja;q=0.7,en-US;q=0.6,en;q=0.5',
+            'Connection': 'keep-alive',
+            'Origin': 'https://www.bilibili.com',
+            'Range': 'bytes=0-500',
+            'Referer':"https://www.bilibili.com/"+self.Bvid,
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'cross-site',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
             }
             #获取视频Content-Range
-            request=requests.get(url=self.videoUrl,headers=header, stream=True, verify=False)
+            request=requests.get(url=self.videoUrl,headers=ContentRange_header, stream=True, verify=False)
             print("status_code :"+str(request.status_code))
             #print("Responseheaders :"+str(request.headers))
             kv=eval(str(request.headers))
@@ -265,13 +266,13 @@ class BilibiliDownloader:
             print("ContentRange :"+self.ContentRange)
             #获取音频Content-Range
             if self.audioUrl!="":
-                request=requests.get(url=self.audioUrl,headers=header, stream=True, verify=False)
+                request=requests.get(url=self.audioUrl,headers= ContentRange_header, stream=True, verify=False)
+                print(request.headers)
                 print("status_code :"+str(request.status_code))
                 #print("Responseheaders :"+str(request.headers))
                 kv=eval(str(request.headers))
                 ContentRange=str(kv["Content-Range"])
-                ContentRange=ContentRange.split('/')[1]
-                self.ContentRange_audio=ContentRange
+                self.ContentRange_audio=ContentRange.split('/')[1]
                 print("ContentRange_audio :"+self.ContentRange_audio)
         except Exception as e:
             print("错误")
@@ -510,6 +511,9 @@ def main():
         if len(videoCache)>1:
             Bd.Convert_concat()
             Bd.clean2()
+    print("Press any key to exit")
+    input()
+
 
 
 
