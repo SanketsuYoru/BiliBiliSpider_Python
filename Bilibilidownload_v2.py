@@ -167,31 +167,32 @@ class BilibiliDownloader:
                 #if this video is Bangumi
                 if "backup_url" not in request.text and "?" not in self.Bvid:
                     redirect_url="https://api.bilibili.com/x/web-interface/view/detail?bvid="+self.Bvid+"&aid=&jsonp=jsonp"
+                    # https://api.bilibili.com/pgc/player/web/playurl?cid=114514&qn=112&type=&otype=json&fourk=1&bvid=BV1sZ4y1N7mz&ep_id=330679&fnver=0&fnval=80
                     request.close()
                     print("需要重定向")
                     print("从"+redirect_url+"获取地址")
                     redirect=requests.get(url=redirect_url,headers=header_info,allow_redirects=False)
-
-                    #print("redirect :\n"+redirect.text)
                     searchObj = re.search( r'("redirect_url":")(.*?)(","rights":{"bp")', redirect.text)
                     print("视频原始地址"+searchObj.group(2))
-                    redirected_url=searchObj.group(2)
+                    searchObj = re.search( r'(https://www.bilibili.com/bangumi/play/)(.*)',searchObj.group(2))
+                    epid=re.sub("\D", "",searchObj.group(2)[2:])
+                    redirected_url="https://api.bilibili.com/pgc/player/web/playurl?cid=114514&qn=112&type=&otype=json&fourk=1&bvid="+self.Bvid+"&ep_id="+epid+"&fnver=0&fnval=80"
                     request=requests.get(url=redirected_url,headers=header_info,allow_redirects=False)
-
+                    # print("redirect :\n"+request.text)
 
                     if "baseUrl" in request.text:
                         print("尝试获取Bangumi下载地址\n\n")
-                        searchObj = re.search( r'(<script>window.__playinfo__=)(.*?)(</script>)', request.text)
-                        kv=json.loads(searchObj.group(2))
+                        # searchObj = re.search( r'(<script>window.__playinfo__=)(.*?)(</script>)', request.text)
+                        kv=json.loads(request.text)
                         
-                        kv=kv["data"]["dash"]["video"]
+                        kv=kv["result"]["dash"]["video"]
                         kv=kv[0]
                         self.videoUrl = kv['baseUrl']
                         print("视频下载地址"+self.videoUrl)
-                        kv=json.loads(searchObj.group(2))
-                        kv=kv["data"]["dash"]["audio"]
+                        kv=json.loads(request.text)
+                        kv=kv["result"]["dash"]["audio"]
                         kv=kv[0]
-                        self.audioUrl=kv['baseUrl']
+                        self.audioUrl=kv['backupUrl'][1]
                         print("音频下载地址"+self.audioUrl)
                     else:
                         print("获取地址失败")
@@ -387,6 +388,7 @@ class BilibiliDownloader:
             #             data_count = data_count + len(data)
             #             now_jd = (data_count / content_size) * 100
             #             print("\r 文件下载进度：%d%%(%d/%d)" % (now_jd, data_count, content_size), end=" ")
+            # self.audioUrl="https://59-45-75-37.mcdn.bilivideo.cn:480/upgcxcode/98/71/238907198/238907198-1-30280.m4s?expires=1601977012&platform=pc&ssig=Eq90OSrMSeXNzxFzi_nMTw&oi=1961492795&trid=48836100e01a426eb18a0b9521a488c0p&nfc=1&nfb=maPYqpoel5MI3qOUX6YpRA==&mcdnid=1000767&mid=0&orderid=1,3&agrr=0&logo=60000001"
             with open(self.path.split('.')[0]+"_audio.mp3", "wb") as f:
                 f.write(requests.get(url=self.audioUrl,headers=Downloadheader_Audio, stream=True, verify=False).content)
             print("下载完成\n")
@@ -484,7 +486,14 @@ class BilibiliDownloader:
 
 
 
-
+# print("开始合成")
+# outfile_name = '7月宇崎学妹想要玩08独家正版1.mp4'
+# #outfile_name = "4月辉夜大小姐想让我告白 第二季正式PV" + '_Converted.mp4'
+# print(outfile_name)
+# subprocess.call(current_path+'/ffmpeg-20200501-39fb1e9-win64-static/bin/ffmpeg -i ' + current_path+'/7月宇崎学妹想要玩08独家正版.mp4'
+#                 + ' -i ' + current_path+'/7月宇崎学妹想要玩08独家正版'+"_audio.mp3" + ' -strict -2 -f mp4 '
+#                 + outfile_name, shell=True)
+# print("已输出")
 
                           
 
@@ -513,8 +522,6 @@ def main():
             Bd.clean2()
     print("Press any key to exit")
     input()
-
-
 
 
 
